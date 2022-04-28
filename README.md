@@ -37,7 +37,8 @@
 - PR 양식
     - 해당 레포지토리를 fork 한다.
     - fork한 레포지토리를 local로 clone한 뒤 자율적으로 브랜치 이름을 생성한다.
-    - 해당 브랜치를 origin으로 push 한 뒤 upstream에 PR을 요청한다. (미션 제출과 동일한 방법)
+    - 해당 브랜치를 origin으로 push 한 뒤 upstream의 main으로 PR을 요청한다. 
+        - (ex. hyeonic/2022-http-web-basic-for-all-developer:hyeonic -> woowacourse-study/2022-http-web-basic-for-all-developer:main)
     - `PR 제목`: [매트] n주차 인터넷 네트워크 & URI와 웹 브라우저 요청 흐름
     - 문서의 위치는 각자 영어 이름 디렉토리 생성 후 n주차.md 파일을 생성한다. (ex. mat/1주차.md)
     - 문서 내용은 자율적으로 작성한다.
