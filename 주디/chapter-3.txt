@@ -1,0 +1,285 @@
+# 3주차 HTTP 메서드 활용 & HTTP 상태코드
+
+# **HTTP 메서드 활용**
+
+# 클라이언트에서 서버로 데이터 전송
+
+## 데이터 전달 방식
+
+1. 쿼리 파라미터를 통한 데이터 전송
+    
+    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f3c1dfa6-f78a-4bf5-a59e-8ab5547ca482/Untitled.png)
+    
+- GET
+- 주로 정렬 필터(검색어)
+1. 메시지 바디를 통한 데이터 전송
+- POST, PUT, PATCH
+- 회원 가입, 상품 주문, 리소스 등록, 리소스 변경
+
+## 데이터 전달 상황
+
+### 1. 정적 데이터 조회
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d6cc9340-7424-41ad-9d12-5f45fb0ffd59/Untitled.png)
+
+- 이미지, 정적 텍스트 문서
+- 조회이므로 HTTP 메서드는 GET 사용
+- 정적 데이터는 일반적으로 쿼리 마라미터 없이 리소스 경로로 단순하게 조회 가능
+
+### 2. 동적 데이터 조회
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/3f0cde8f-271b-470d-806e-1d93df6e941e/Untitled.png)
+
+쿼리 파라미터를 기반으로 결과를 동적으로 생성한다,
+
+- 주로 검색, 게시판 목록에서 정렬 필터(검색어)
+- 조회 조건을 줄여주는 필터, 조회 결과를 정렬하는 정렬 조건에 주로 사용
+- 조회는 것이므로 GET 사용
+- GET은 쿼리 파라미터 사용해서 데이터 전달(바디를 쓸 수 있으나 지원하지 않는 서버가 많아서 안쓰는 것을 추천)
+
+### 3. HTML Form을 통한 데이터 전송 ⇒ Get, Post만 가능
+
+`POST`
+
+- 회원 가입, 상품 주문, 데이터 변경
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7ee52abf-9a62-4d56-b5b1-17d372199fd4/Untitled.png)
+
+입력 창을 만들고 싶을 때, 위와 같은 html을 만들 수 있음
+
+ 그렇게 되면 아래와 같이 웹 브라우저가 request message(쿼리파라미터와 동일한 방식의 바디로 값을 넣어서)를 만듬
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e44bf46d-e186-41e2-8809-e3b5333a3a52/Untitled.png)
+
+`GET`
+
+- 데이터 조회
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/22e86660-5741-4bea-a163-a96909417df8/Untitled.png)
+
+get의 경우 쿼리 파라미터를 사용
+
+---
+
+`Content-Type`
+
+- 일반적으로 application/x-www-form-urlencoded 사용
+from의 내용을 바디를 통해 전송
+전송 데이터 인코딩처리 해줌
+- multipart/form-data
+파일 업로드 같은 바이너리 데이터 전송시 사용
+여러 종류의 파일과 폼을 함께 전송 가능
+알아서 boundary 정해서 잘라서 보내짐
+1. HTTP API를 통한 데이터 전송
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/455a1469-a430-4287-8771-6d4c6fe75c7c/Untitled.png)
+
+- 서버 to 서버 ⇒ 백엔드 시스템 통신
+- 앱 클라이언트
+- 웹 클라이언트(Ajax) ⇒ 자바스크립트를 통한 통신
+- Content-Type → application/json 주로 사용
+
+# HTTP API 설계 예시
+
+Post 기반 등록, Put 기반 등록, Html 기반 등록 이렇게 3개를 예시 + POST 등록 vs PUT 등록
+
+## POST 기반 등록
+
+ex) 회원 관리 시스템
+
+- 회원 목록 /members -> GET
+- 회원 등록 /members -> POST
+- 회원 조회 /members/{id} -> GET
+- 회원 수정 /members/{id} -> PATCH, PUT, POST
+- 회원 삭제 /members/{id} -> DELETE
+
+## PUT 기반 등록
+
+ex) 파일 관리 시스템
+
+- 파일 목록 /files -> GET
+- 파일 조회 /files/{filename} -> GET
+- 파일 등록 /files/{filename} -> PUT
+- 파일 삭제 /files/{filename} -> DELETE
+- 파일 대량 등록 /files -> POST
+
+## POST 기반 등록 vs PUT 기반 등록
+
+`차이점`
+
+1. 클라이언트가 등록될 리소스의 URI를 아는지의 유뮤
+
+안다 ⇒ PUT (ex. PUT/files/star.jpg), 클라이언트가 리소스를 관리
+
+모든다 ⇒ POST (ex. POST/members), 클라이언트가 서버에게 요청
+
+1. 새로운 리소스 URI를 누가 지정하는지
+
+클라이언트 ⇒ PUT (요청 URI 자체가 클라이언트가 직접 지정한 리소스 URI)
+
+서버 ⇒ POST (서버에서 생성한 후, response Location에 해당 리소스 URI를 넣어줌)
+
+1. 리소스를 누가 관리하는지
+
+`클라이언트`
+
+스토어 ⇒ 클라이언트가 관리하는 리소스 저장소
+
+클라이언트가 리솔의 URI를 알고 관리한다. 여기서는 /files
+
+`서버`
+
+컬렉션 ⇒ 서버가 관리하는 리소스 디렉토리
+
+서버가 리소스의 URI를 생성하고 관리한다. 여기서는 /member
+
+## HTML FORM
+
+- 회원 목록 /members -> GET
+- 회원 등록 폼을 보여줄 때 /members/new -> GET
+- 회원 등록 /members/new, /members -> POST
+- 회원 조회 /members/{id} -> GET
+- 회원 수정 폼 /members/{id}/edit -> GET
+- 회원 수정 /members/{id}/edit, /members/{id} -> POST
+- 회원 삭제 /members/{id}/delete -> POST
+
+`특징`
+
+- GET,POST만 지원
+- 컨트롤 URI 사용 ⇒ HTTP 메서드로 해결하기 애매한 경우
+
+# HTTP 상태코드
+
+### 클라이언트가 보낸 요청의 처리 상태를 응답에서 알려주는 기능
+
+- 1xx (Informational): 요청이 수신되어 처리중 ⇒ 거의 사용하지 않음
+- 2xx (Successful): 요청 정상 처리
+    
+    ## 200 OK
+    
+    - 요청 성공
+    
+    ## 201 Created
+    
+    - 요청 성공 + 새로운 리소스 생성
+    - 새로운 리소스는 response의 Location 헤더에 있음
+    
+    ## 202 Accepted
+    
+    - 요청은 성공 + 처리가 완료되지 않음
+    - 주로 배치 처리할 때 사용
+    
+    ## 204 No Content
+    
+    - 요청 성공 + 응답 페이로드 본문에 보낼 데이터가 없음을 의미
+    - 화면이 변하지 않아야하는 저장 요청을 보낼 때 주로 사용
+    
+    [](https://hanamon.kr/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-http-%ED%8E%98%EC%9D%B4%EB%A1%9C%EB%93%9C-payload%EB%9E%80/)
+    
+- 3xx (Redirection): 요청을 완료하려면 클라이언트(웹 브라우저)에서추가 행동이 필요
+    
+    ## 리다이렉트의 흐름
+    
+    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/ff411514-5a7f-4866-8011-df8e9845243c/Untitled.png)
+    
+    리다이렉트 응답의 Location으로 자동으로 변경
+    
+    ## 리다이렉션의 종류
+    
+    ### 영구 리다이렉션 - 특정 리소스의 URI가 영구적으로 이동
+    
+    - 예) /members -> /users
+    - 예) /event -> /new-event
+    - 리소스 URI가 영구적으로 이동
+    
+    ## 301 Moved Permanently
+    
+    - 청 메서드가 GET으로 변하고 본문이 제거될 수 있음
+    
+    ## 308 Permanent Redirect
+    
+    - HTTP 메서드나 body가 변하지 않음
+    
+    ### 일시 리다이렉션 - 일시적인 변경
+    
+    - 주문 완료 후 주문 내역 화면으로 이동
+    - PRG: Post/Redirect/Get’
+    - 리소스의 URI가 일시적으로 변경
+    
+    ## 302 Found
+    
+    - 요청 메서드가 GET으로 변하고 본문이 제거될 수 있음
+    - http 메서드나 본문 유지 유무가 명확하지 않음
+    
+    ## 303 See Other
+    
+    - 요청 메서드가 GET으로 변경
+    
+    ## 307 Temporary Redirect
+    
+    - HTTP 메서드와 body 유치
+    
+    =⇒ 307, 303을 권장하지만 현실적으로 이미 많은 애플리케이션 라이브러리들이 302를 기본값으로 사용
+    
+    ## PRG: Post/Redirect/Get
+    
+    post요청 페이지에서 새로고침을 한 경우 → 새로 리소스가 등록될 수 있음
+    
+    ⇒ Post 요청 후, 새로고침으로 인한 중복 주문 방지
+    
+    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/ca7e1d48-9ec3-4581-86ad-3c4bec9ad315/Untitled.png)
+    
+    ⇒ 중복 주문 대신에 이미 POST → GET으로 리다이렉트 된 결과 화면만 GET으로 다시 요청
+    
+    ### 특수 리다이렉션
+    
+    - 결과 대신 캐시를 사용(캐시 기간 관련)
+    
+    ## 300 Multiple Choices → 거의 안씀
+    
+    ## 304 Not Modified
+    
+    - 캐시를 목적으로 사용
+    - 클라이언트에게 리소스가 수정되지 않았음을 알려준다. (캐시로 리다이렉트 한다.)
+    - 로컬 캐시를 사용해야 하므로 304 응답은 응답에 메시지 바디를 포함하면 안된다.
+    - 조건부 GET, HEAD 요청시 사용
+- 4xx (Client Error): 클라이언트 오류, 잘못된 문법등으로 서버가 요청을 수행할 수 없음
+    
+    ### 오류의 원인이 클라이언트에 있음
+    
+    - 클라이언트가 이미 잘못된 요청, 데이터를 보내고 있음을 의미
+    - 재시도 해도 실패
+    
+    ## 400 Bad Request
+    
+    - 클라이언트가 잘못된 요청을 해서 서버가 요청을 처리할 수 없는 상태
+    - 클라이언트는 요청 내용을 검토하고, 바뀐 요청을 보내야 오류가 나지 않음
+    - 명확한 검증 로직을 가지고 판단해야함
+    - 예) 요청 파라미터가 잘못되거나, API 스펙이 맞지 않을 때
+    
+    ## 401 Unauthorized
+    
+    - 클라이언트가 해당 리소스에 대한 인증(본인이 누구인지)이 필요함
+    - 401 오류 발생시 응답에 WWW-Authenticate 헤더와 함께 인증 방법을 설명
+    
+    ## 403 Forbidden
+    
+    - 서버가 요청을 이해했지만 승인을 거부함
+    - 주로 인증 자격 증명은 있지만, 접근 권한이 불충분한 경우(인가가 없는 경우)
+    
+    ## 404 Not Found
+    
+    - 요청 리소스가 서버에 없거나 클라이언트가 권한이 부족한 리소스에 접근할 때 해당 리소스를 숨기고 싶을 때
+- 5xx (Server Error): 서버 오류, 서버가 정상 요청을 처리하지 못함
+    
+    ### 서버 문제로 오류 발생
+    
+    - 서버에 문제가 있기 때문에 재시도 하면 성공할 수도 있음(복구가 되거나 등등)
+    
+    ## 500 Internal Server Error
+    
+    - 서버 문제로 오류 발생, 애매하면 500 오류
+    
+    ## 503 Service Unavailable
+    
+    - 서버가 일시적인 과부하 또는 예정된 작업으로 잠시 요청을 처리할 수 없어 서비스를 이용할 수 없음
